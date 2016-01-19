@@ -1,5 +1,6 @@
 package queens
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /**
@@ -7,32 +8,18 @@ import scala.util.Random
  */
 object nQueens extends App{
 
-//  show()
+  show(nqueens(4))
 
   def nqueens(n: Int): List[Int] = {
 
-
-//    def min_conflicts(soln, nr, iters=1000):
-//    def random_pos(li, filt):
-//    return random.choice([i for i in range(nr) if filt(li[i])])
-//
-//    for k in range(iters):
-//      confs = find_conflicts(soln, nr)
-//    if sum(confs) == 0:
-//    return soln
-//    col = random_pos(confs, lambda elt: elt > 0)
-//    vconfs = [hits(soln, nr, col, row) for row in range(nr)]
-//    soln[col] = random_pos(vconfs, lambda elt: elt == min(vconfs))
-//    raise Exception("Incomplete solution: try more iterations.")
-
+    @tailrec
     def minConflicts(solution: List[Int]): List[Int] ={
       val conflicts = findConflicts(solution)
       if(conflicts.sum == 0) solution
       else {
-        val col = randomPosition(conflicts)
-        val rowMap = solution.length
-        val queensWithRow = (0 until rowMap) zip solution
-        queensWithRow.map(queenWithRow => hits(queenWithRow._2, queenWithRow._1, solution)).toList
+        val row = randomPosition(conflicts)
+        val vconficts =  for(col <- solution.indices) yield hits(col, row, solution)
+        minConflicts(solution.updated(row, vconficts.min))
       }
     }
 
@@ -59,7 +46,7 @@ object nQueens extends App{
       queensWithRow.map(queenWithRow => hits(queenWithRow._2, queenWithRow._1, queens)).toList
     }
 
-  Nil
+    minConflicts(List.range(0, n))
   }
 
   def show(solutions: List[Int]): Unit = {
